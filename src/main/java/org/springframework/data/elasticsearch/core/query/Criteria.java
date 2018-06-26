@@ -17,8 +17,7 @@ package org.springframework.data.elasticsearch.core.query;
 
 import java.util.*;
 
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.elasticsearch.core.geo.GeoBox;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
@@ -43,8 +42,8 @@ public class Criteria {
 				"field=" + field.getName() +
 				", boost=" + boost +
 				", negating=" + negating +
-				", queryCriteria=" + ObjectUtils.nullSafeToString(queryCriteria) +
-				", filterCriteria=" + ObjectUtils.nullSafeToString(filterCriteria) +
+				", queryCriteria=" + StringUtils.join(queryCriteria, '|') +
+				", filterCriteria=" + StringUtils.join(filterCriteria, '|') +
 				'}';
 	}
 
@@ -438,7 +437,7 @@ public class Criteria {
 	 * @return
 	 */
 	public Criteria within(String geoLocation, String distance) {
-		Assert.isTrue(!StringUtils.isEmpty(geoLocation), "geoLocation value must not be null");
+		Assert.isTrue(StringUtils.isNotBlank(geoLocation), "geoLocation value must not be null");
 		filterCriteria.add(new CriteriaEntry(OperationKey.WITHIN, new Object[]{geoLocation, distance}));
 		return this;
 	}
@@ -475,8 +474,8 @@ public class Criteria {
 	 * @return Criteria the chaind criteria with the new 'boundedBy' criteria included.
 	 */
 	public Criteria boundedBy(String topLeftGeohash, String bottomRightGeohash) {
-		Assert.isTrue(!StringUtils.isEmpty(topLeftGeohash), "topLeftGeohash must not be empty");
-		Assert.isTrue(!StringUtils.isEmpty(bottomRightGeohash), "bottomRightGeohash must not be empty");
+		Assert.isTrue(StringUtils.isNotBlank(topLeftGeohash), "topLeftGeohash must not be empty");
+		Assert.isTrue(StringUtils.isNotBlank(bottomRightGeohash), "bottomRightGeohash must not be empty");
 		filterCriteria.add(new CriteriaEntry(OperationKey.BBOX, new Object[]{topLeftGeohash, bottomRightGeohash}));
 		return this;
 	}
@@ -503,7 +502,7 @@ public class Criteria {
 	}
 
 	private void assertNoBlankInWildcardedQuery(String searchString, boolean leadingWildcard, boolean trailingWildcard) {
-		if (searchString != null && searchString.contains(CRITERIA_VALUE_SEPERATOR)) {
+		if (StringUtils.contains(searchString, CRITERIA_VALUE_SEPERATOR)) {
 			throw new InvalidDataAccessApiUsageException("Cannot constructQuery '" + (leadingWildcard ? "*" : "") + "\""
 					+ searchString + "\"" + (trailingWildcard ? "*" : "") + "'. Use expression or multiple clauses instead.");
 		}

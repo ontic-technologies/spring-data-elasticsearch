@@ -18,6 +18,7 @@ package org.springframework.data.elasticsearch.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.common.settings.Settings;
@@ -30,8 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.StringUtils;
-
 import static java.util.Arrays.*;
 
 /**
@@ -96,7 +95,7 @@ public class NodeClientFactoryBean implements FactoryBean<Client>, InitializingB
 	}
 
 	private Settings loadConfig() throws IOException {
-		if (!StringUtils.isEmpty(pathConfiguration)) {
+		if (StringUtils.isNotBlank(pathConfiguration)) {
 			InputStream stream = getClass().getClassLoader().getResourceAsStream(pathConfiguration);
 			if (stream != null) {
 				return Settings.builder().loadFromStream(pathConfiguration, getClass().getClassLoader().getResourceAsStream(pathConfiguration), false).build();
